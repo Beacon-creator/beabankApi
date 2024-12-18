@@ -1,0 +1,7 @@
+extends layout
+
+block content
+  h1= message || 'An Error Occurred'
+  h2 Status: #{error.status || 500}
+  if error.stack
+    pre #{error.stack}
