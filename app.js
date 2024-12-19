@@ -6,9 +6,9 @@ var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-var refreshRouter = require("./routes/refreshRoutes");
-var reminderRouter = require("./routes/reminderRoutes");
-var signinRouter = require("./routes/signinRoutes");
+// var refreshRouter = require("./routes/refreshRoutes");
+// var reminderRouter = require("./routes/reminderRoutes");
+// var signinRouter = require("./routes/signinRoutes");
 var signupRouter = require("./routes/signupRoutes");
 
 var app = express();
@@ -25,9 +25,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-app.use("/refresh", refreshRouter);
-app.use("/reminder", reminderRouter);
-app.use("/signin", signinRouter);
+// app.use("/refresh", refreshRouter);
+// app.use("/reminder", reminderRouter);
+// app.use("/signin", signinRouter);
 app.use("/signup", signupRouter);
 
 
