@@ -1,21 +1,20 @@
-import mongoose from "mongoose";
-import dotenv from "dotenv";
+const mongoose = require("mongoose");
+const dotenv = require("dotenv");
 
-dotenv.config(); // Load environment variables
+dotenv.config();
 
-const mongoURI = process.env.MONGO_URI;
+mongoose.set("strictQuery", false); // Maintain strict query compliance
 
-if (!mongoURI) {
-  console.error("MONGO_URI is undefined. Check your environment variables.");
-  process.exit(1); // Exit the app if the URI is not provided
-}
+const dbConnect = async () => {
+  try {
+    const conn = await mongoose.connect(process.env.MONGO_URI);
+    console.log(
+      `Connected to MongoDB database successfully: ${conn.connection.host}`
+    );
+  } catch (error) {
+    console.error("Connection failed:", error.message);
+    process.exit(1); // Exit the process in case of a critical error
+  }
+};
 
-mongoose
-  .connect(mongoURI)
-  .then(() => {
-    console.log("Connected to MongoDB");
-  })
-  .catch((err) => {
-    console.error("Error connecting to MongoDB:", err.message);
-    process.exit(1); // Exit the app if the connection fails
-  });
+module.exports = dbConnect;
