@@ -46,12 +46,10 @@ app.use((err, req, res, next) => {
   });
 });
 
+// Serve static files from the "uploads" folder
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 // activate mongoDB
 dbConnect();
-// Start the server
-// const PORT = process.env.PORT || 3000;
-// app.listen(PORT, () => {
-//   console.log(`Server running on port ${PORT}`);
-// });
+
 
 module.exports = app;
