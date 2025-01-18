@@ -5,7 +5,7 @@ var cookieParser = require("cookie-parser");
 var dbConnect = require ("./config/database");
 var logger = require("morgan");
 var cors = require("cors");
-var routes = require("./routes/mainRoutes");
+var routes = require("./routes/mainRoutes.js");
 const mongoose = require("mongoose");
 var dotenv = require("dotenv");
 
