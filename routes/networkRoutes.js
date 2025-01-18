@@ -1,5 +1,5 @@
 const express = require("express");
-const { getNetworkStrength } = require("../controllers/networkController");
+const { getNetworkStrength } = require("../controllers/networkcontroller");
 
 const router = express.Router();
 

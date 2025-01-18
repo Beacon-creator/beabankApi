@@ -2,7 +2,7 @@ const express = require("express");
 const {
   upload,
   uploadProfilePic,
-} = require("../controllers/profileController");
+} = require("../controllers/profilecontroller");
 const { authenticateUser } = require("../controllers/authController");
 
 const router = express.Router();
