@@ -1,21 +1,39 @@
 const express = require("express");
-const os = require("os");
-const router = express.Router();
+const si = require("systeminformation");
 
-// Function to calculate network strength
-const getNetworkStrength = () => {
-  const networkInterfaces = os.networkInterfaces();
-  const strengths = [];
+const getNetworkStrength = async () => {
+  try {
+    const networkData = await si.networkInterfaces();
+    const activeInterfaces = networkData.filter(
+      (iface) => iface.operstate === "up" && iface.type === "wireless"
+    );
 
-  Object.keys(networkInterfaces).forEach((key) => {
-    networkInterfaces[key].forEach((iface) => {
-      if (iface.family === "IPv4" && !iface.internal) {
-        strengths.push(Math.random() * 100); // Mock strength percentage
+    if (activeInterfaces.length > 0) {
+      const wifiInfo = await si.wifiNetworks();
+      console.log("WiFi Networks Info:", wifiInfo);
+
+      // Match active Wi-Fi network
+      const activeWifi = wifiInfo.find((wifi) =>
+        activeInterfaces.some((iface) => iface.iface === "Wi-Fi" && wifi.ssid)
+      );
+
+      if (activeWifi) {
+        // Convert signal level to percentage
+        const signalLevel = activeWifi.signalLevel;
+        const signalPercentage = Math.max(0, Math.min(100, 2 * (signalLevel + 100)));
+
+        // Return only SSID and signal strength
+        return { ssid: activeWifi.ssid, strength: signalPercentage };
       }
-    });
-  });
 
-  return strengths.length ? Math.max(...strengths) : 0;
+      return { ssid: "Unknown", strength: null }; // Handle cases without SSID or strength
+    } else {
+      return { ssid: "No active network", strength: null }; // No active interfaces
+    }
+  } catch (error) {
+    console.error("Error fetching network strength:", error);
+    throw new Error("Failed to fetch network strength.");
+  }
 };
 
-module.exports = {getNetworkStrength}
+module.exports = { getNetworkStrength };

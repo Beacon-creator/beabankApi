@@ -34,6 +34,9 @@ app.use(function (req, res, next) {
   next(createError(404));
 });
 
+//app.disable("etag"); // Disable ETag headers
+
+
 // Error handler middleware
 app.use((err, req, res, next) => {
   const status = err.status || 500;
