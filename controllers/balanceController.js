@@ -1,4 +1,4 @@
-const Balance = require("../models/balanceModel");
+const Balance = require("../models/balanceModel.js");
 
 const TIMER_RESET = 86400; // 24 hours in seconds
 const INCREMENT_RATE = 0.0001;

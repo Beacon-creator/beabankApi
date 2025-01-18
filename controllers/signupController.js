@@ -1,7 +1,7 @@
 const { validationResult, matchedData } = require("express-validator");
 const bcrypt = require("bcrypt");
-const { User } = require("../models/userModel");
-const { generateToken } = require("../middlewares/functionMiddleware");
+const { User } = require("../models/userModel.js");
+const { generateToken } = require("../middlewares/functionMiddleware.js");
 
 // Function to handle user signup
 const signupHandler = async (req, res) => {

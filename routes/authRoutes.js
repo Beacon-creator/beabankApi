@@ -3,7 +3,7 @@ const router = express.Router();
 const {
   authenticateUser,
   fetchUserData,
-} = require("../controllers/authController");
+} = require("../controllers/authController.js");
 
 // Route to fetch user data, ensuring the user is authenticated
 router.get("/auth/user-data", authenticateUser, fetchUserData);
