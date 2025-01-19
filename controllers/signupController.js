@@ -1,5 +1,5 @@
 const { validationResult, matchedData } = require("express-validator");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const { User } = require("../models/userModel.js");
 const { generateToken } = require("../middlewares/functionMiddleware.js");
 
