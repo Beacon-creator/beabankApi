@@ -1,5 +1,5 @@
 const express = require("express");
-const { signinHandler } = require("../controllers/signincontroller");
+const { signinHandler } = require("../controllers/signinController");
 const { checkSchema } = require("express-validator");
 const UserValidationSchema = require("../middlewares/validationMiddleware");
 
