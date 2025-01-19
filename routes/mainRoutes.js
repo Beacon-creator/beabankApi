@@ -1,13 +1,13 @@
 const express = require("express");
-const signupRoutes = require("./signupRoutes");
-const signinRoutes = require("./signinRoutes");
-const balanceRoutes = require("./balanceRoutes");
-const useridentifyRoutes = require("./authRoutes");
-const networkRoutes = require("./networkRoutes");
-const logoutRoutes = require("./logoutRoutes");
-const profileRoutes = require("./profileRoutes");
-const index = require("./index");
-const users = require("./users");
+const signupRoutes = require("./signupRoutes.js");
+const signinRoutes = require("./signinRoutes.js");
+const balanceRoutes = require("./balanceRoutes.js");
+const useridentifyRoutes = require("./authRoutes.js");
+const networkRoutes = require("./networkRoutes.js");
+const logoutRoutes = require("./logoutRoutes.js");
+const profileRoutes = require("./profileRoutes.js");
+const index = require("./index.js");
+const users = require("./users.js");
 const router = express.Router();
 
 router.use(signupRoutes);
