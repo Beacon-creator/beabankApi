@@ -3,7 +3,7 @@ const {
   getBalance,
   updateBalance,
   updateProgress,
-} = require("../controllers/balancecontroller.js");
+} = require("../controllers/balanceController.js");
 
 const router = express.Router();
 
