@@ -2,8 +2,8 @@ const express = require("express");
 const {
   upload,
   uploadProfilePic,
-} = require("../controllers/profilecontroller");
-const { authenticateUser } = require("../controllers/authController");
+} = require("../controllers/profileController.js");
+const { authenticateUser } = require("../controllers/authController.js");
 
 const router = express.Router();
 

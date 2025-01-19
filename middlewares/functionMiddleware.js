@@ -5,7 +5,7 @@ require("dotenv").config();
 
 const jwtSecret = process.env.JWT_SECRET;
 const expirein = process.env.LOGIN_EXPIRES;
-const { User } = require("../models/userModel");
+const { User } = require("../models/userModel.js");
 
 // Ensure jwtSecret has a value
 if (!jwtSecret) {
