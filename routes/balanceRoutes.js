@@ -2,6 +2,7 @@ const express = require("express");
 const {
   getBalance,
   updateBalance,
+  startMining,
   updateProgress,
 } = require("../controllers/balanceController.js");
 
