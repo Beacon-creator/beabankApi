@@ -18,6 +18,37 @@ const formatTime = (seconds) => {
 };
 
 // Rest of your existing calculateProgress function...
+// const calculateProgress = (user) => {
+//   const now = new Date();
+//   const lastUpdate = new Date(user.lastUpdated);
+//   const elapsedSeconds = Math.floor((now - lastUpdate) / 1000);
+
+//   if (elapsedSeconds <= 0) return user;
+
+//   const completedCycles = Math.floor(elapsedSeconds / TIMER_RESET);
+//   const remainingSeconds = elapsedSeconds % TIMER_RESET;
+
+//   let newTimer;
+//   if (user.timer > remainingSeconds) {
+//     newTimer = user.timer - remainingSeconds;
+//   } else {
+//     const extraCycles = Math.floor((remainingSeconds - user.timer) / TIMER_RESET);
+//     newTimer = TIMER_RESET - ((remainingSeconds - user.timer) % TIMER_RESET);
+//   }
+
+//   const totalActiveSeconds = (completedCycles * TIMER_RESET) + 
+//     (user.timer < remainingSeconds ? user.timer : remainingSeconds);
+//   const balanceIncrement = totalActiveSeconds * INCREMENT_RATE;
+
+//   user.balance = Math.min(user.balance + balanceIncrement, MAX_BALANCE);
+//   user.timer = newTimer;
+//   user.lastUpdated = now;
+//   user.totalEarned = (user.totalEarned || 0) + balanceIncrement;
+
+//   return user;
+// };
+
+// Updated calculateProgress function...
 const calculateProgress = (user) => {
   const now = new Date();
   const lastUpdate = new Date(user.lastUpdated);
@@ -25,28 +56,21 @@ const calculateProgress = (user) => {
 
   if (elapsedSeconds <= 0) return user;
 
-  const completedCycles = Math.floor(elapsedSeconds / TIMER_RESET);
-  const remainingSeconds = elapsedSeconds % TIMER_RESET;
-
-  let newTimer;
-  if (user.timer > remainingSeconds) {
-    newTimer = user.timer - remainingSeconds;
-  } else {
-    const extraCycles = Math.floor((remainingSeconds - user.timer) / TIMER_RESET);
-    newTimer = TIMER_RESET - ((remainingSeconds - user.timer) % TIMER_RESET);
-  }
-
-  const totalActiveSeconds = (completedCycles * TIMER_RESET) + 
-    (user.timer < remainingSeconds ? user.timer : remainingSeconds);
-  const balanceIncrement = totalActiveSeconds * INCREMENT_RATE;
-
+  // Calculate active mining time (up to remaining timer)
+  const activeSeconds = Math.min(elapsedSeconds, user.timer);
+  
+  // Update balance
+  const balanceIncrement = activeSeconds * INCREMENT_RATE;
   user.balance = Math.min(user.balance + balanceIncrement, MAX_BALANCE);
-  user.timer = newTimer;
+  user.totalEarned += balanceIncrement;
+  
+  // Update timer
+  user.timer = Math.max(0, user.timer - activeSeconds);
   user.lastUpdated = now;
-  user.totalEarned = (user.totalEarned || 0) + balanceIncrement;
 
   return user;
 };
+
 
 const getBalance = async (req, res) => {
   const { userId } = req.params;
@@ -132,6 +156,45 @@ const updateBalance = async (req, res) => {
 };
 
 
+const startMining = async (req, res) => {
+  const { userId } = req.body;
+
+  try {
+    let user = await Balance.findOne({ userId });
+
+    // If user doesn't exist, create new entry
+    if (!user) {
+      user = new Balance({
+        userId,
+        balance: 0,
+        timer: TIMER_RESET,
+        lastUpdated: new Date(),
+        totalEarned: 0
+      });
+    } else {
+      // If user exists but timer isn't running, reset it
+      if (user.timer <= 0) {
+        user.timer = TIMER_RESET;
+        user.lastUpdated = new Date();
+      }
+    }
+
+    await user.save();
+
+    res.status(200).json({
+      timer: user.timer,
+      timerFormatted: formatTime(user.timer),
+      balance: parseFloat(user.balance.toFixed(4)),
+      lastUpdated: user.lastUpdated
+    });
+
+  } catch (err) {
+    console.error("Error starting mining:", err);
+    res.status(500).json({ error: "Failed to start mining" });
+  }
+};
+
+
 // Updating the other controller functions to include formatted time...
 const updateProgress = async (req, res) => {
   const { userId, timer } = req.body;
@@ -169,5 +232,6 @@ const updateProgress = async (req, res) => {
 module.exports = {
   getBalance,
   updateBalance,
+  startMining,
   updateProgress,
 };
