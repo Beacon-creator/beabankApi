@@ -71,7 +71,6 @@ const calculateProgress = (user) => {
   return user;
 };
 
-
 const getBalance = async (req, res) => {
   const { userId } = req.params;
 
