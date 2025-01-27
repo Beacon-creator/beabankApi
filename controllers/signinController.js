@@ -31,11 +31,18 @@ const signinHandler = async (req, res) => {
     });
 
     // Set token as an HTTP-only cookie
+    // res.cookie("jwt", token, {
+    //   httpOnly: true,
+    //   maxAge: 60 * 60 * 1000, // 1 hour
+    //   secure: process.env.NODE_ENV === "production", // Must be true for sameSite: "none"
+    //   sameSite: "none", // Allow cross-site requests
+    // });
+
     res.cookie("jwt", token, {
       httpOnly: true,
       maxAge: 60 * 60 * 1000, // 1 hour
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: process.env.NODE_ENV === "production", // Only true in production
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // "none" in production, "lax" in development
     });
 
     return res.status(200).json({
