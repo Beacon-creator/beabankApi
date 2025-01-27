@@ -88,10 +88,17 @@ const getBalance = async (req, res) => {
 };
 
 const updateBalance = async (req, res) => {
-  const { userId, increment } = req.body;
+  const { userId, timer, increment } = req.body;
 
-  if (!userId || typeof increment !== "number" || increment <= 0) {
-    return res.status(400).json({ error: "Invalid userId or increment value" });
+  // if (!userId || typeof increment !== "number" || increment <= 0) {
+  //   return res.status(400).json({ error: "Invalid userId or increment value" });
+  // }
+
+  if (!userId || typeof timer !== "number" || timer < 0 || timer > TIMER_RESET) {
+    return res.status(400).json({ 
+      error: "Invalid userId or timer value",
+      maxTimer: TIMER_RESET
+    });
   }
 
   try {
@@ -104,13 +111,16 @@ const updateBalance = async (req, res) => {
     // First update based on elapsed time
     user = calculateProgress(user);
     
-    // Then add manual increment
+    user.timer = timer;
     user.balance = Math.min(user.balance + increment, MAX_BALANCE);
     user.totalEarned = (user.totalEarned || 0) + increment;
     
     await user.save();
 
     res.status(200).json({
+
+      timer: user.timer,
+      timerFormatted: formatTime(user.timer),
       balance: parseFloat(user.balance.toFixed(4)),
       totalEarned: parseFloat(user.totalEarned.toFixed(4))
     });
@@ -120,7 +130,9 @@ const updateBalance = async (req, res) => {
     res.status(500).json({ error: "Failed to update balance" });
   }
 };
-// Update the other controller functions to include formatted time...
+
+
+// Updating the other controller functions to include formatted time...
 const updateProgress = async (req, res) => {
   const { userId, timer } = req.body;
 
