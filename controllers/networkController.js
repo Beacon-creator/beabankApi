@@ -4,52 +4,40 @@ const si = require("systeminformation");
 const getNetworkStrength = async () => {
   try {
     const networkData = await si.networkInterfaces();
-    
-    // Look for any active wireless interface
-    const activeInterfaces = networkData.filter(
-      (iface) => iface.operstate === "up" && 
-      (iface.type === "wireless" || iface.type.includes("wifi") || iface.type.includes("wlan"))
+    const wifiInfo = await si.wifiNetworks();
+
+    // First try to find wireless connection
+    const wireless = networkData.find(
+      iface => iface.operstate === "up" && iface.type === "wireless"
     );
 
-    if (activeInterfaces.length > 0) {
-      const wifiInfo = await si.wifiNetworks();
-      
-      // Find any active wireless network
-      const activeWifi = wifiInfo.find((wifi) =>
-        activeInterfaces.some((iface) => wifi.ssid)
-      );
+    if (wireless && wifiInfo.length > 0) {
+      const activeWifi = wifiInfo[0]; // Get first wireless network
+      const signalLevel = activeWifi.signalLevel || -50;
+      const signalPercentage = Math.max(0, Math.min(100, 2 * (signalLevel + 100)));
 
-      if (activeWifi) {
-        const signalLevel = activeWifi.signalLevel || -50; // Default if not available
-        const signalPercentage = Math.max(0, Math.min(100, 2 * (signalLevel + 100)));
-        
-        return {
-          ssid: activeWifi.ssid,
-          strength: signalPercentage,
-          details: {
-            interface: activeInterfaces[0].iface,
-            type: activeInterfaces[0].type
-          }
-        };
-      }
-    }
-
-    // Get any connected network info if WiFi detection fails
-    const defaultNetwork = networkData.find(net => net.operstate === "up");
-    if (defaultNetwork) {
       return {
-        ssid: defaultNetwork.ifaceName || "Connected",
-        strength: 100, // Default strength for wired connections
+        ssid: activeWifi.ssid,
+        strength: signalPercentage,
         details: {
-          interface: defaultNetwork.iface,
-          type: defaultNetwork.type
+          interface: wireless.iface,
+          type: "wireless"
         }
       };
     }
 
-    return { ssid: "No active network", strength: 0 };
+    // Fallback to any active connection
+    const active = networkData.find(net => net.operstate === "up");
+    return {
+      ssid: active?.iface || "Unknown",
+      strength: active ? 100 : 0,
+      details: {
+        interface: active?.iface,
+        type: active?.type || "unknown"
+      }
+    };
   } catch (error) {
-    console.error("Error fetching network strength:", error);
+    console.error("Error:", error);
     throw error;
   }
 };
