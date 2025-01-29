@@ -6,6 +6,9 @@ const getNetworkStrength = async () => {
     const networkData = await si.networkInterfaces();
     const wifiInfo = await si.wifiNetworks();
 
+    console.log('Network Interfaces:', networkData); // Debug log
+    console.log('WiFi Networks:', wifiInfo); // Debug log
+
     // First try to find wireless connection
     const wireless = networkData.find(
       iface => iface.operstate === "up" && iface.type === "wireless"
