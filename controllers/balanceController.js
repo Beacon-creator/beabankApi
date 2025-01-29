@@ -49,6 +49,9 @@ const formatTime = (seconds) => {
 // };
 
 // Updated calculateProgress function...
+
+
+
 const calculateProgress = (user) => {
   const now = new Date();
   const lastUpdate = new Date(user.lastUpdated);

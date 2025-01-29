@@ -4,35 +4,53 @@ const si = require("systeminformation");
 const getNetworkStrength = async () => {
   try {
     const networkData = await si.networkInterfaces();
+    
+    // Look for any active wireless interface
     const activeInterfaces = networkData.filter(
-      (iface) => iface.operstate === "up" && iface.type === "wireless"
+      (iface) => iface.operstate === "up" && 
+      (iface.type === "wireless" || iface.type.includes("wifi") || iface.type.includes("wlan"))
     );
 
     if (activeInterfaces.length > 0) {
       const wifiInfo = await si.wifiNetworks();
-      console.log("WiFi Networks Info:", wifiInfo);
-
-      // Match active Wi-Fi network
+      
+      // Find any active wireless network
       const activeWifi = wifiInfo.find((wifi) =>
-        activeInterfaces.some((iface) => iface.iface === "Wi-Fi" && wifi.ssid)
+        activeInterfaces.some((iface) => wifi.ssid)
       );
 
       if (activeWifi) {
-        // Convert signal level to percentage
-        const signalLevel = activeWifi.signalLevel;
+        const signalLevel = activeWifi.signalLevel || -50; // Default if not available
         const signalPercentage = Math.max(0, Math.min(100, 2 * (signalLevel + 100)));
-
-        // Return only SSID and signal strength
-        return { ssid: activeWifi.ssid, strength: signalPercentage };
+        
+        return {
+          ssid: activeWifi.ssid,
+          strength: signalPercentage,
+          details: {
+            interface: activeInterfaces[0].iface,
+            type: activeInterfaces[0].type
+          }
+        };
       }
-
-      return { ssid: "Unknown", strength: null }; // Handle cases without SSID or strength
-    } else {
-      return { ssid: "No active network", strength: null }; // No active interfaces
     }
+
+    // Get any connected network info if WiFi detection fails
+    const defaultNetwork = networkData.find(net => net.operstate === "up");
+    if (defaultNetwork) {
+      return {
+        ssid: defaultNetwork.ifaceName || "Connected",
+        strength: 100, // Default strength for wired connections
+        details: {
+          interface: defaultNetwork.iface,
+          type: defaultNetwork.type
+        }
+      };
+    }
+
+    return { ssid: "No active network", strength: 0 };
   } catch (error) {
     console.error("Error fetching network strength:", error);
-    throw new Error("Failed to fetch network strength.");
+    throw error;
   }
 };
 
